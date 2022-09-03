@@ -1,4 +1,7 @@
-﻿namespace InternFirst_WebApi.Controllers;
+﻿using InternFirst_WebApi.ActionFilters;
+using InternFirst_WebApi.Services;
+
+namespace InternFirst_WebApi.Controllers;
 
 [Produces("application/json")]
 [Route("api/[controller]")]
@@ -39,11 +42,10 @@ public class CarsController : ControllerBase
     /// <response code="200">Success</response>
     /// <response code="404">If the car with such id is not exist</response>
     [HttpGet("{id}")]
+    [ServiceFilter(typeof(CheckCarExistsAttribute))]
     public ActionResult<Car> Get(int id)
-    {
-        var car = _garage.CarsList.FirstOrDefault(c => c.Id == id);
-        if (car is null)
-            return NotFound();
+    {        
+        var car = HttpContext.Items["car"] as Car;
 
         return Ok(car);
     }
@@ -60,13 +62,12 @@ public class CarsController : ControllerBase
     /// <response code="204">Success</response>
     /// <response code="404">If the car with such id is not exist</response>
     [HttpDelete("{id}")]
+    [ServiceFilter(typeof(CheckCarExistsAttribute))]
     public IActionResult Delete(int id)
     {
-        var car = _garage.CarsList.FirstOrDefault(c => c.Id == id);
-        if (car is null)
-            return NotFound();
+        var car = HttpContext.Items["car"] as Car;
 
-        _garage.CarsList.Remove(car);
+        _garage.CarsList.Remove(car!);
 
         return NoContent();
     }
@@ -110,23 +111,25 @@ public class CarsController : ControllerBase
     /// <response code="200">Success</response>
     /// <response code="404">If the car with such id is not exist</response>
     [HttpPut("{id}")]
+    [ServiceFilter(typeof(CheckCarExistsAttribute))]
     public ActionResult<Car> Update(int id, [FromQuery] string? model = null, string? color = null)
     {
-        var car = _garage.CarsList.FirstOrDefault(c => c.Id == id);
-        if (car is null)
-            return NotFound();
+        var car = HttpContext.Items["car"] as Car;
 
         UpdateCar(model, color, car);
 
         return Ok(car);
     }
 
-    private static void UpdateCar(string? model, string? color, Car car)
+    private static void UpdateCar(string? model, string? color, Car? car)
     {
-        if (!string.IsNullOrEmpty(model))
-            car.Model = model;
-        if (!string.IsNullOrEmpty(color))
-            car.Color = color;
+        if (car is not null)
+        {
+            if (!string.IsNullOrEmpty(model))
+                car.Model = model;
+            if (!string.IsNullOrEmpty(color))
+                car.Color = color; 
+        }
     }
 
     private int GetNewId()
