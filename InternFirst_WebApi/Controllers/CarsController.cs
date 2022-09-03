@@ -1,7 +1,4 @@
-﻿using InternFirst_WebApi.ActionFilters;
-using InternFirst_WebApi.Services;
-
-namespace InternFirst_WebApi.Controllers;
+﻿namespace InternFirst_WebApi.Controllers;
 
 [Produces("application/json")]
 [Route("api/[controller]")]

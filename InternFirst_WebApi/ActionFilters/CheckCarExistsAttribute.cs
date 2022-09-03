@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-
-namespace InternFirst_WebApi.ActionFilters;
+﻿namespace InternFirst_WebApi.ActionFilters;
 
 public class CheckCarExistsAttribute : Attribute, IActionFilter
 {
